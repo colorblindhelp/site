@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en" data-vision="normal">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ColorBlind Helper: see the web through different eyes</title>
+  <meta name="description" content="A free Chrome extension that simulates protanopia, deuteranopia, tritanopia and monochromacy on any webpage, and helps you find low-contrast elements.">
+  <meta name="theme-color" content="#f5f6f8">
+  <link rel="canonical" href="https://colorblindhelperr-bit.github.io/colorblind-helper/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ColorBlind Helper: see the web through different eyes">
+  <meta property="og:description" content="A free Chrome extension that simulates protanopia, deuteranopia, tritanopia and monochromacy on any webpage, and helps you find low-contrast elements.">
+  <meta property="og:url" content="https://colorblindhelperr-bit.github.io/colorblind-helper/">
+  <meta property="og:image" content="https://colorblindhelperr-bit.github.io/colorblind-helper/assets/media/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/media/apple-touch-icon.png">
+  <script>
+    /* Apply the saved vision preview before first paint to avoid a flash. */
+    (function () {
+      try {
+        var ok = /^(normal|protanopia|deuteranopia|tritanopia|monochromacy)$/;
+        var q = new URLSearchParams(location.search).get("vision");
+        var v = q && ok.test(q) ? q : localStorage.getItem("cbh-vision");
+        if (v && ok.test(v)) document.documentElement.setAttribute("data-vision", v);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="preload" href="assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/poppins-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/site.css">
+  
+  <script src="assets/js/vision.js" defer></script>
+  <script src="assets/js/site.js" defer></script>
+</head>
+<body id="top">
+  <svg class="svg-defs" aria-hidden="true" focusable="false"><defs><filter id="cbh-protanopia" color-interpolation-filters="linearRGB"><feColorMatrix type="matrix" values="0.152286 1.05258 -0.204868 0 0  0.114503 0.786281 0.099216 0 0  -0.003882 -0.048116 1.052 0 0  0 0 0 1 0"/></filter><filter id="cbh-deuteranopia" color-interpolation-filters="linearRGB"><feColorMatrix type="matrix" values="0.367322 0.860646 -0.227968 0 0  0.280085 0.672501 0.047413 0 0  -0.01182 0.04294 0.968881 0 0  0 0 0 1 0"/></filter><filter id="cbh-tritanopia" color-interpolation-filters="linearRGB"><feColorMatrix type="matrix" values="1.25553 -0.076749 -0.178779 0 0  -0.078411 0.930809 0.147602 0 0  0.004733 0.691367 0.3039 0 0  0 0 0 1 0"/></filter><filter id="cbh-monochromacy" color-interpolation-filters="linearRGB"><feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0"/></filter></defs></svg>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header" data-header>
+    <div class="wrap header-inner">
+      <a class="brand" href="#top"><img src="assets/media/mark.svg" alt="" width="30" height="30"><span class="brand-name">ColorBlind Helper</span></a>
+      <nav class="primary-nav" id="primary-nav" aria-label="Main" data-nav>
+        <ul><li><a href="#features" data-spy="features">Features</a></li><li><a href="#how" data-spy="how">How it works</a></li><li><a href="#about" data-spy="about">About</a></li><li><a href="#privacy" data-spy="privacy">Privacy</a></li><li><a href="#contact" data-spy="contact">Contact</a></li><li><a class="btn btn--primary nav-cta" href="https://chromewebstore.google.com/detail/color-blind-mode/aihpepghlmlapndfnhlkgkajgfpjcklb" target="_blank" rel="noopener">Add to Chrome<span class="sr-only"> (opens in a new tab)</span></a></li></ul>
+      </nav>
+      <div class="header-actions">
+        <div class="vision" data-vision-root>
+        <button type="button" class="vision-toggle" aria-expanded="false" aria-controls="vision-panel" data-vision-toggle>
+          <svg class="split-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>
+          <span class="vt-text"><span class="vt-kicker">Vision preview</span><span class="vt-name" data-vision-label>Normal vision</span></span>
+          <svg class="chev" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 8l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="sr-only">. Change color vision simulation for this site</span>
+        </button>
+        <div class="vision-scrim" hidden data-vision-scrim></div>
+        <div class="vision-panel" id="vision-panel" role="dialog" aria-labelledby="vision-title" hidden data-vision-panel>
+          <h2 id="vision-title">Preview this site with a color vision deficiency</h2>
+          <p class="vp-note">A simulation to help you understand how color can change. It's an approximation: everyone's color vision is a little different.</p>
+          <fieldset class="vision-options">
+            <legend class="sr-only">Simulation mode</legend>
+            <label class="vision-option"><input type="radio" name="vision" value="normal" checked><span class="vo-body"><span class="vo-radio" aria-hidden="true"></span><span class="vo-name">Normal vision</span><span class="vo-state" aria-hidden="true">On</span><span class="vo-desc">Typical color vision. No simulation applied.</span></span></label><label class="vision-option"><input type="radio" name="vision" value="protanopia"><span class="vo-body"><span class="vo-radio" aria-hidden="true"></span><span class="vo-name">Protanopia</span><span class="vo-state" aria-hidden="true">On</span><span class="vo-desc">No working red-sensitive cones. Reds look darker and drift toward brown.</span></span></label><label class="vision-option"><input type="radio" name="vision" value="deuteranopia"><span class="vo-body"><span class="vo-radio" aria-hidden="true"></span><span class="vo-name">Deuteranopia</span><span class="vo-state" aria-hidden="true">On</span><span class="vo-desc">No working green-sensitive cones. Reds and greens become hard to tell apart.</span></span></label><label class="vision-option"><input type="radio" name="vision" value="tritanopia"><span class="vo-body"><span class="vo-radio" aria-hidden="true"></span><span class="vo-name">Tritanopia</span><span class="vo-state" aria-hidden="true">On</span><span class="vo-desc">No working blue-sensitive cones. Blues and greens, and yellows and pinks, get confused.</span></span></label><label class="vision-option"><input type="radio" name="vision" value="monochromacy"><span class="vo-body"><span class="vo-radio" aria-hidden="true"></span><span class="vo-name">Monochromacy</span><span class="vo-state" aria-hidden="true">On</span><span class="vo-desc">Little or no color perception. Everything appears in shades of grey.</span></span></label>
+          </fieldset>
+          <div class="vp-foot">
+            <p>Your choice stays on as you move between pages.</p>
+            <button type="button" class="link-btn" data-vision-reset disabled>Back to normal vision</button>
+          </div>
+        </div>
+      </div>
+        <a class="btn btn--primary btn--small header-cta" href="https://chromewebstore.google.com/detail/color-blind-mode/aihpepghlmlapndfnhlkgkajgfpjcklb" target="_blank" rel="noopener">Add to Chrome<span class="sr-only"> (opens in a new tab)</span></a>
+        <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="primary-nav" data-menu-toggle><svg class="icon-open" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><svg class="icon-close" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="sr-only">Menu</span></button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <h1 id="hero-title"><span class="line">See the web through</span> <span class="line">different eyes.</span></h1>
+          <p class="lede">ColorBlind Helper is a free Chrome extension that shows how any webpage looks with protanopia, deuteranopia, tritanopia or monochromacy, and helps you spot low-contrast elements before they reach your users.</p>
+          <div class="hero-actions">
+            <a class="btn btn--primary" href="https://chromewebstore.google.com/detail/color-blind-mode/aihpepghlmlapndfnhlkgkajgfpjcklb" target="_blank" rel="noopener">Add to Chrome, it’s free <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M11 3h6v6M17 3l-8 8M14 12v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="sr-only"> (opens in a new tab)</span></a>
+            <button type="button" class="btn btn--ghost" data-vision-open><svg class="split-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>Preview this site</button>
+          </div>
+          <p class="hero-meta">Listed on the Chrome Web Store as “Color Blind Mode.” Built for designers, developers, accessibility testers, and anyone curious how color reads to others.</p>
+        </div>
+
+        <figure class="lens-figure" aria-labelledby="lens-caption-what">
+          <div class="lens-stage">
+            <div class="lens" data-lens>
+              <span class="lens-tag lens-tag--a" aria-hidden="true">Typical vision</span>
+              <span class="lens-tag lens-tag--b" aria-hidden="true" data-lens-tag>Deuteranopia (simulated)</span>
+              <div class="lens-layer" aria-hidden="true" data-lens-base>
+            <div class="mock">
+              <div class="mock-bar"><span class="mock-dots"><i></i><i></i><i></i></span><span class="mock-url">status.example.com</span></div>
+              <div class="mock-body">
+                <div class="mock-head"><h3>Release status, last 8 weeks</h3>
+                  <div class="mock-legend"><span><i class="dot dot--green"></i>On track</span><span><i class="dot dot--blue"></i>In review</span><span><i class="dot dot--amber"></i>At risk</span><span><i class="dot dot--red"></i>Blocked</span></div></div>
+                <ul class="mock-rows"><li><span class="mr-name">Checkout redesign</span><span class="mr-cells"><i class="cell cell--green"></i><i class="cell cell--green"></i><i class="cell cell--green"></i><i class="cell cell--amber"></i><i class="cell cell--green"></i><i class="cell cell--green"></i><i class="cell cell--blue"></i><i class="cell cell--green"></i></span></li><li><span class="mr-name">Search API</span><span class="mr-cells"><i class="cell cell--green"></i><i class="cell cell--amber"></i><i class="cell cell--amber"></i><i class="cell cell--red"></i><i class="cell cell--red"></i><i class="cell cell--red"></i><i class="cell cell--amber"></i><i class="cell cell--green"></i></span></li><li><span class="mr-name">Onboarding emails</span><span class="mr-cells"><i class="cell cell--blue"></i><i class="cell cell--blue"></i><i class="cell cell--green"></i><i class="cell cell--green"></i><i class="cell cell--green"></i><i class="cell cell--amber"></i><i class="cell cell--amber"></i><i class="cell cell--green"></i></span></li><li><span class="mr-name">Billing migration</span><span class="mr-cells"><i class="cell cell--amber"></i><i class="cell cell--amber"></i><i class="cell cell--red"></i><i class="cell cell--red"></i><i class="cell cell--blue"></i><i class="cell cell--blue"></i><i class="cell cell--green"></i><i class="cell cell--green"></i></span></li></ul>
+                <div class="mock-chart">
+                  <div class="mock-head"><h3>Signups vs. cancellations</h3>
+                  <div class="mock-legend"><span><i class="dot dot--green"></i>Signups</span><span><i class="dot dot--red"></i>Cancellations</span></div></div>
+                  <svg viewBox="0 0 400 90" preserveAspectRatio="none">
+                    <g stroke="#edeff3" stroke-width="1"><path d="M0 15H400M0 45H400M0 75H400"/></g>
+                    <polyline fill="none" stroke="#d7263d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" points="4,70 60,58 116,62 172,44 228,50 284,34 340,40 396,28"/>
+                    <polyline fill="none" stroke="#23863f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" points="4,80 60,66 116,50 172,54 228,34 284,40 340,22 396,14"/>
+                  </svg>
+                </div>
+                <div class="mock-form">
+                  <div class="mock-field"><span class="mf-label">Work email</span><div>jordan@</div></div>
+                  <span class="mock-btn mock-btn--go">Save</span>
+                  <span class="mock-btn mock-btn--stop">Delete</span>
+                </div>
+              </div>
+            </div>
+              </div>
+              <div class="lens-handle" aria-hidden="true"><span class="lens-knob"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <input class="lens-range" type="range" min="0" max="100" value="50" step="1" aria-label="Comparison divider. Left shows typical vision, right shows the simulation." data-lens-range>
+            </div>
+          </div>
+          <div class="lens-controls">
+            <fieldset>
+              <legend>Compare with</legend>
+              <label class="chip"><input type="radio" name="lens-mode" value="protanopia"><span>Protanopia</span></label>
+              <label class="chip"><input type="radio" name="lens-mode" value="deuteranopia" checked><span>Deuteranopia</span></label>
+              <label class="chip"><input type="radio" name="lens-mode" value="tritanopia"><span>Tritanopia</span></label>
+              <label class="chip"><input type="radio" name="lens-mode" value="monochromacy"><span>Monochromacy</span></label>
+            </fieldset>
+          </div>
+          <figcaption class="lens-caption" aria-live="polite">
+            <p class="lc-what" id="lens-caption-what" data-lens-what>A sample status page where meaning lives only in color. Drag the divider to compare. With deuteranopia, the green “On track” and red “Blocked” squares turn into near-identical yellow-browns, and the two chart lines look the same.</p>
+            <p>The fix is rarely new colors. It’s a second cue: a text label, an icon, or a pattern.</p>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="problem section--tight" aria-labelledby="problem-title">
+      <div class="wrap problem-grid">
+        <p class="problem-figure">1 in 12<small>men, and about 1 in 200 women, have some form of color vision deficiency.</small></p>
+        <div class="problem-body">
+          <h2 id="problem-title">Color is often the only thing carrying the message.</h2>
+          <p>Red for errors, green for success, a chart legend made of colored dots. With typical color vision it’s easy to miss when those cues stop working. ColorBlind Helper lets you check on the real page, in a couple of clicks.</p>
+          <p class="src">Source: <a href="https://www.utmb.edu/accessibility/digital/100-days-of-a11y/100-days-article/days-of-a11y/2024/04/03/3.-color-blindness" target="_blank" rel="noopener">UTMB Digital Accessibility<span class="sr-only"> (opens in a new tab)</span></a></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="features" aria-labelledby="features-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="features-title">Test real pages, not screenshots.</h2>
+          <p>ColorBlind Helper applies its filter to the website in your current tab, so you can scroll and review the page the way you normally would.</p>
+        </div>
+
+        <article class="feature" aria-labelledby="f1-title">
+          <div class="feature-copy">
+            <h3 id="f1-title">Eight modes, grouped the way vision differs</h3>
+            <p>Choose from milder anomalous forms through to complete deficiencies, plus a High Contrast mode. Pick one from the dropdown and press Apply filter.</p>
+            <ul>
+              <li><strong>Red-green:</strong> deuteranomaly, protanomaly, deuteranopia, protanopia</li>
+              <li><strong>Blue-yellow:</strong> tritanomaly, tritanopia</li>
+              <li><strong>Other:</strong> achromatopsia (monochromacy) and High Contrast</li>
+            </ul>
+            <p class="fine">Simulations use color transformation matrices based on published research by Brettel, Viénot and others.</p>
+          </div>
+          <figure class="popup-replica">
+            <div class="popup-card">
+              <img src="assets/media/mark.svg" alt="" width="52" height="52">
+              <p class="popup-title">Color Blind Helper</p>
+              <p class="popup-sub">See the web through different eyes</p>
+              <ul class="popup-list" aria-label="Modes available in the extension">
+                <li class="opt opt--on">Off</li>
+                <li class="grp" aria-hidden="true">Red-Green Color Blindness</li>
+                <li class="opt">Deuteranomaly (most common)</li>
+                <li class="opt">Protanomaly</li>
+                <li class="opt">Deuteranopia (complete)</li>
+                <li class="opt">Protanopia (complete)</li>
+                <li class="grp" aria-hidden="true">Blue-Yellow Color Blindness</li>
+                <li class="opt">Tritanomaly</li>
+                <li class="opt">Tritanopia (complete)</li>
+                <li class="grp" aria-hidden="true">Other</li>
+                <li class="opt">Achromatopsia (complete)</li>
+                <li class="opt">High Contrast</li>
+              </ul>
+            </div>
+            <figcaption>The extension popup with its mode list open.</figcaption>
+          </figure>
+        </article>
+
+        <article class="feature" aria-labelledby="f2-title">
+          <div class="feature-copy">
+            <h3 id="f2-title">Find the text people can’t read</h3>
+            <p>Light grey copy, pale placeholders, buttons that fade into the background: low contrast is one of the most common accessibility problems on the web. Switch to High Contrast mode to make low-contrast elements stand out, then fix them at the source.</p>
+            <p>Contrast matters to everyone, not only people with a color vision deficiency. It decides whether text holds up on a phone in sunlight or a dim projector.</p>
+          </div>
+          <div class="contrast-lab" data-contrast>
+            <div class="cl-sample" data-cl-sample>
+              <p class="cl-head">Your order is on its way</p>
+              <p>We’ll email tracking details as soon as the package leaves our warehouse.</p>
+            </div>
+            <div class="cl-readout">
+              <p class="cl-ratio" aria-live="polite"><span data-cl-ratio>2.8</span>:1<small>contrast</small></p>
+              <ul class="cl-verdicts" data-cl-verdicts></ul>
+            </div>
+            <div class="cl-control">
+              <label for="cl-range">Text color <output for="cl-range" data-cl-hex>#999999</output></label>
+              <input class="range" id="cl-range" type="range" min="0" max="220" value="153" step="1" data-cl-range>
+            </div>
+            <p class="cl-note">Try it: drag to change the text color. This sample uses the WCAG 2 contrast formula, where body text needs at least 4.5:1 to meet level AA.</p>
+          </div>
+        </article>
+
+        <article class="feature" aria-labelledby="f3-title">
+          <div class="feature-copy">
+            <h3 id="f3-title">Stays out of your way</h3>
+            <p>No accounts, no setup screens. It lives in your toolbar until you need it.</p>
+          </div>
+          <dl class="facts">
+            <div><dt>One click</dt><dd>Open the popup, choose a mode and press Apply filter.</dd></div>
+            <div><dt>Any website</dt><dd>Works on the pages you open in Chrome, including your own.</dd></div>
+            <div><dt>Remembers your mode</dt><dd>Your last choice is saved, so the filter carries over to new pages.</dd></div>
+            <div><dt>Runs locally</dt><dd>Everything happens in your browser. Nothing is sent to a server.</dd></div>
+          </dl>
+        </article>
+      </div>
+    </section>
+
+    <section class="section night" id="how" aria-labelledby="how-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="how-title">From install to first preview</h2>
+          <p>Four steps, and the last one is just switching it off.</p>
+        </div>
+        <div class="how-grid">
+          <ol class="steps">
+            <li>
+              <h3>Add it to Chrome</h3>
+              <p>It’s free. Open the Chrome Web Store listing and choose <span class="kbd-ui">Add to Chrome</span></p>
+              <a class="btn btn--on-night btn--small" href="https://chromewebstore.google.com/detail/color-blind-mode/aihpepghlmlapndfnhlkgkajgfpjcklb" target="_blank" rel="noopener">Open the Chrome Web Store <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M11 3h6v6M17 3l-8 8M14 12v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="sr-only"> (opens in a new tab)</span></a>
+            </li>
+            <li>
+              <h3>Pin it to your toolbar</h3>
+              <p>Click the puzzle-piece Extensions icon and pin <strong>Color Blind Mode</strong> so it’s always one click away.</p>
+            </li>
+            <li>
+              <h3>Pick a mode and apply</h3>
+              <p>Open the popup on any page, choose a simulation from the dropdown and press <span class="kbd-ui">Apply filter</span></p>
+            </li>
+            <li>
+              <h3>Switch back to Off</h3>
+              <p>Set the dropdown to Off whenever you want to see the page normally again.</p>
+            </li>
+          </ol>
+          <figure class="video-frame">
+            <div class="vf-box">
+              <video controls preload="none" playsinline poster="assets/media/demo-poster.jpg" width="960" height="628" aria-describedby="video-desc">
+                <source src="assets/media/demo.mp4" type="video/mp4">
+                Your browser can’t play this video. <a href="assets/media/demo.mp4">Download the walkthrough (MP4)</a>.
+              </video>
+            </div>
+            <figcaption id="video-desc">A 49-second walkthrough with no audio: pinning the extension, then applying deuteranopia, protanopia, tritanomaly and achromatopsia to a Wikipedia article about color blindness.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about" aria-labelledby="about-title">
+      <div class="wrap about-grid">
+        <figure class="portrait">
+          <picture>
+            <source srcset="assets/media/mihir-480.webp" type="image/webp">
+            <img src="assets/media/mihir-480.jpg" alt="Portrait of Mihir Sanghvi" width="480" height="640" loading="lazy" decoding="async">
+          </picture>
+          <figcaption><strong>Mihir Sanghvi</strong><span>Founder and developer. Computer Science, Rutgers University NB</span></figcaption>
+        </figure>
+        <div>
+          <h2 id="about-title" class="sr-only">About the founder</h2>
+          <blockquote class="about-quote">
+            <p>“Being a person who knows the struggles of having colorblindness, I’m passionate about building tools that help people with the same struggles that I face.”</p>
+          </blockquote>
+          <div class="about-body">
+            <p>Hi, I’m Mihir Sanghvi, a computer science student at Rutgers University. I’m in love with the idea of building tools that help people.</p>
+            <p>ColorBlind Helper began as a personal project while auditing client work for accessibility gaps. Today, it’s grown into a community-driven effort to normalize accessible color testing everywhere.</p>
+            <div class="sig">
+              <a class="btn btn--ghost btn--small" href="https://www.linkedin.com/in/mihir-sanghvi-09111235b/" target="_blank" rel="noopener">Follow the journey on LinkedIn <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M11 3h6v6M17 3l-8 8M14 12v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="sr-only"> (opens in a new tab)</span></a>
+              <a class="btn btn--ghost btn--small" href="#contact">Send Mihir a message</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section privacy-band" id="privacy" aria-labelledby="privacy-title">
+      <div class="wrap privacy-grid">
+        <div>
+          <h2 id="privacy-title">Private by design</h2>
+          <p class="lead">Color Blind Helper operates entirely on your device and does not send any information to external servers.</p>
+          <p class="updated">Privacy policy last updated January 2026</p>
+        </div>
+        <div>
+          <ul class="no-list" aria-label="Information the extension does not collect">
+            <li><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 15.5l11-11" stroke="currentColor" stroke-width="1.8"/></svg><div><strong>No personal information</strong><span>Such as your name, address, email address or phone number.</span></div></li>
+            <li><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 15.5l11-11" stroke="currentColor" stroke-width="1.8"/></svg><div><strong>No browsing data</strong><span>Such as your browsing history, search history or the URLs you visit.</span></div></li>
+            <li><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 15.5l11-11" stroke="currentColor" stroke-width="1.8"/></svg><div><strong>No website content</strong><span>Any text, form data or private content you enter on any webpage.</span></div></li>
+            <li><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 15.5l11-11" stroke="currentColor" stroke-width="1.8"/></svg><div><strong>No usage data or identifiers</strong><span>No information about how you interact with sites, and no IP address or device ID.</span></div></li>
+          </ul>
+          <a class="btn btn--ghost" href="privacy.html">Read the full privacy policy</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact" aria-labelledby="contact-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="contact-title">Get in touch</h2>
+          <p>Feedback, a bug report, a feature idea, or interest in bringing ColorBlind Helper to your team or organization. Send a note and it goes straight to Mihir.</p>
+        </div>
+        <div class="contact-grid">
+          <form class="form" novalidate data-contact-form aria-describedby="form-note">
+            <div class="form-status" role="alert" tabindex="-1" hidden data-form-status></div>
+            <div class="form-row">
+              <div class="field">
+                <label for="cf-name">Name</label>
+                <input id="cf-name" name="name" type="text" autocomplete="name" required aria-describedby="cf-name-err">
+                <p class="field-error" id="cf-name-err"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10 2.5l8 14.5H2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 8v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.6" r="1.1" fill="currentColor"/></svg><span></span></p>
+              </div>
+              <div class="field">
+                <label for="cf-email">Email</label>
+                <input id="cf-email" name="email" type="email" autocomplete="email" required aria-describedby="cf-email-err">
+                <p class="field-error" id="cf-email-err"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10 2.5l8 14.5H2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 8v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.6" r="1.1" fill="currentColor"/></svg><span></span></p>
+              </div>
+            </div>
+            <div class="field">
+              <label for="cf-topic">What’s it about?</label>
+              <select id="cf-topic" name="topic">
+                <option>General question</option>
+                <option>Feedback or a feature idea</option>
+                <option>Bug report</option>
+                <option>Collaboration</option>
+                <option>Using it in my organization</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="cf-message">Message <span class="hint">(at least 10 characters)</span></label>
+              <textarea id="cf-message" name="message" required aria-describedby="cf-message-err"></textarea>
+              <p class="field-error" id="cf-message-err"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10 2.5l8 14.5H2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 8v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.6" r="1.1" fill="currentColor"/></svg><span></span></p>
+            </div>
+            <div class="form-foot">
+              <button type="submit" class="btn btn--primary" data-submit><span data-submit-label>Write email</span></button>
+              <p id="form-note">Opens your email app with your message filled in, ready to send.</p>
+            </div>
+          </form>
+
+          <aside class="contact-aside" aria-labelledby="direct-title">
+            <h3 id="direct-title">Reach out directly</h3>
+            <dl>
+              <div>
+                <dt>Email</dt>
+                <dd><a href="mailto:Sanghvim175@gmail.com">Sanghvim175@gmail.com</a>
+                  <button type="button" class="copy-btn" data-copy="Sanghvim175@gmail.com"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><rect x="7" y="7" width="10" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 4.5V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span data-copy-label>Copy</span></button></dd>
+              </div>
+              <div>
+                <dt>LinkedIn</dt>
+                <dd><a href="https://www.linkedin.com/in/mihir-sanghvi-09111235b/" target="_blank" rel="noopener">Mihir Sanghvi<span class="sr-only"> (opens in a new tab)</span></a></dd>
+              </div>
+            </dl>
+            <p class="who">ColorBlind Helper Chrome Extension is built and maintained by Mihir Sanghvi, a Computer Science student at Rutgers University NB. This website is built and maintained by Justin Park, a Human-Centered Computing student at Rochester Institute of Technology.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-cta">
+        <div>
+          <h2>Check your colors before your users have to.</h2>
+          <p>Free on the Chrome Web Store. Install it once and every page you open is ready to test.</p>
+        </div>
+        <a class="btn btn--on-night" href="https://chromewebstore.google.com/detail/color-blind-mode/aihpepghlmlapndfnhlkgkajgfpjcklb" target="_blank" rel="noopener">Add to Chrome <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M11 3h6v6M17 3l-8 8M14 12v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="sr-only"> (opens in a new tab)</span></a>
+      </div>
+      <div class="footer-meta">
+        <div>
+          <a class="brand" href="#top"><img src="assets/media/mark.svg" alt="" width="30" height="30">ColorBlind Helper</a>
+          <p>The vision preview on this website uses the color-vision model by Machado, Oliveira and Fernandes (2009). It approximates common color vision deficiencies for design review and doesn't represent every person's experience.</p>
+        </div>
+        <nav aria-label="Footer">
+          <ul class="footer-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how">How it works</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="privacy.html">Privacy policy</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="https://chromewebstore.google.com/detail/color-blind-mode/aihpepghlmlapndfnhlkgkajgfpjcklb" target="_blank" rel="noopener">Chrome Web Store<span class="sr-only"> (opens in a new tab)</span></a></li>
+          </ul>
+        </nav>
+        <p class="copy">&copy; <span data-year>2026</span> ColorBlind Helper</p>
+      </div>
+    </div>
+  </footer>
+  <div class="vision-bar" role="region" aria-label="Vision preview status" hidden data-vision-bar>
+    <p class="vb-msg"><svg class="split-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg><span>Previewing <strong data-vision-bar-label>Normal vision</strong> (simulated)</span></p>
+    <div class="vb-actions">
+      <button type="button" data-vision-change>Change</button>
+      <button type="button" class="vb-reset" data-vision-reset>Back to normal</button>
+    </div>
+  </div>
+  <p class="sr-only" aria-live="polite" data-vision-live></p>
+</body>
+</html>
